@@ -5,7 +5,7 @@ sites like github, gitlab, bitbucket, etc.
 
 Library supports following clients:
 * [x] Github
-* [ ] Gitlab
+* [x] Gitlab
 * [ ] Bitbucket
 
 ## Installation and Usage
@@ -28,45 +28,60 @@ client := client := getrelease.NewGithubClient(nil, "someOwner", "someRepo")
 ```
 
 #### Authentication
-The go-getrelease library clients does not directly handle authentication. Instead, when creating a new client, 
-pass an http.Client that can handle authentication for you. For `Github` client, this can be done as follows:
+go-getrelease library clients have different authentication methods based on which client is being used. Overview is
+provided for each client.
+
+##### Github
+Github client does not directly handle authentication. Instead, when creating a new client, pass an http.Client that 
+can handle authentication for you. This can be done as follows:
 
 ```go
 import "golang.org/x/oauth2"
 
 func main() {
-	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: "... your access token ..."},
 	)
-	tc := oauth2.NewClient(ctx, ts)
+	tc := oauth2.NewClient(context.Background(), ts)
 
 	client := getrelease.NewGithubClient(tc, "someOwner", "someRepo")
 }
 ```
 
-Note: Each client will handle authentication differently based on what can be provided.
+##### Gitlab
+Gitlab client provided three ways of authentication: `OAuth`, `Private Token` and `Basic Authorization`. You can create
+the client accordingly using one of New functions. Examples:
+
+```go
+import "golang.org/x/oauth2"
+
+func main() {
+	token := "----Some OAuth Token-----"
+	client := getrelease.NewOAuthGitlabClient(nil, getrelease.GitlabDefaultBaseURL, token)
+}
+```
+
 
 ### Downloading Latest Release Asset
-Downloading an asset from the latest release requires the name of asset and the location where the asset will be 
-downloaded. If the asset is an archived file, it is automatically `unarchieved` but, this can be turned off by
+Downloading an asset from some release tag requires the location where the asset will be downloaded, name of asset, 
+owner, and repo If the asset is an archived file, it is automatically `unarchieved` but, this can be turned off by
 specifying `options`. Options are explained later on in another section. Client provided will provide information
 on where to get the release asset from.
 
 ```go
-if err := GetLatestAsset(client, "./download", "file.txt"); err != nil {
+if err := GetLatestAsset(client, "./download", "file.txt", "someOwner", "someRepo"); err != nil {
     panic(err);
 }
 ```
 
 ### Downloading Tag Release Asset
-Downloading an asset from some release tag requires the tag name, name of asset, and the location where the asset will 
-be downloaded. If the asset is an archived file, it is automatically `unarchieved` but, this can be turned off by
-specifying `options`. Options are explained later on in another section. Client provided will provide information
-on where to get the release asset from.
+Downloading an asset from some release tag requires the location where the asset will be downloaded, name of asset, 
+owner, repo, and tag name. If the asset is an archived file, it is automatically `unarchieved` but, this can be 
+turned off by specifying `options`. Options are explained later on in another section. Client provided will provide 
+information on where to get the release asset from.
 
 ```go
-if err := GetTagAsset(client, "./download", "v1.0.0", "file.txt"); err != nil {
+if err := GetTagAsset(client, "./download", "file.txt", "someOwner", "someRepo", "v1.0.0"); err != nil {
     panic(err);
 }
 ```
@@ -96,7 +111,7 @@ can be modified accordingly.
 Example:
 
 ```go
-if err := GetTagAsset(client, "./download", "v1.0.0", "file.txt", func(config *getrelease.Configuration) error {
+if err := GetTagAsset(client, "./download", "file.txt", "v1.0.0", func(config *getrelease.Configuration) error {
 	config.Checksum = "md5:46798b5cfca45c46a84b7419f8b74735"
 	return nil
 }); err != nil {
