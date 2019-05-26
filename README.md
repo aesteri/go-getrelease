@@ -56,6 +56,23 @@ if err := GetTagAsset(client, "./download", "v1.0.0", "file.txt"); err != nil {
 }
 ```
 
+### Asset Names
+Asset names are the names of the assets that will be retrieved from the release. These names can be regex and this
+regex will be matched against all the assets available. For examples if asset in latest release is `asset_0.1.0.txt`
+but, you do not know the version so, you can name the asset as `asset_.*_.txt` and it will automatically be matched.
+
+Example:
+```go
+if err := getrelease.GetTagAsset(client, "./wio", "wio_.*_linux_64bit.tar.gz",
+    "v0.9.0", func(config *getrelease.Configuration) error {
+        config.Checksum = "asset:wio_.*_checksums.txt"
+        return nil
+    }); err != nil {
+        panic(err)
+}
+````
+
+
 ## Options
 go-getrelease provide a way of customizing how files are downloaded and few other features like checksum verification.
 When a call is made to `GetLatestAsset` or `GetTagAsset`, variadic number of `Options` can be provided where config
@@ -82,7 +99,7 @@ Library comes with few options out of box that can be used:
 ## Progress
 While downloading files, a listener can be registered that will listen to progress. Library calls `TrackProgress` method
 and provides it with `src`, `currentSize`, `totalSize`, and `stream`. This information can be used to create a progress
-tracker. Example of this can be see in [progress_tracker](examples/progress_tarcker) example folder.
+tracker. Example of this can be see in [progress_tracker](examples/progress_tracker) example folder.
 
 ## Archive
 go-getrelease will automatically unarchive files into a file or directory based on the extension of the file being requested.
