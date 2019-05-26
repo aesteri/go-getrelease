@@ -5,15 +5,26 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/go-github/github"
+	"net/http"
 	"regexp"
 )
 
-var rawClient = github.NewClient(nil)
-
 // GithubClient is a client for github
-type GithubClient struct {
-	Owner string
-	Repo  string
+type githubClient struct {
+	owner      string
+	repo       string
+	httpClient *http.Client
+	rawClient  *github.Client
+}
+
+// NewGithubClient returns github client
+func NewGithubClient(client *http.Client, owner, repo string) *githubClient {
+	return &githubClient{
+		owner:      owner,
+		repo:       repo,
+		httpClient: client,
+		rawClient:  github.NewClient(client),
+	}
 }
 
 // getAssetUrl is a generic url getter for github release assets
@@ -32,9 +43,9 @@ func getAssetUrl(release *github.RepositoryRelease, response *github.Response, a
 }
 
 // getTagAssetUrl fetches github releases of the project and returns link to specified asset of tag release
-func (client *GithubClient) getTagAssetUrl(assetNameReg *regexp.Regexp, tag string) (*string, error) {
-	release, response, err := rawClient.Repositories.GetReleaseByTag(
-		context.Background(), client.Owner, client.Repo, tag)
+func (client *githubClient) getTagAssetUrl(assetNameReg *regexp.Regexp, tag string) (*string, error) {
+	release, response, err := client.rawClient.Repositories.GetReleaseByTag(
+		context.Background(), client.owner, client.repo, tag)
 	if err != nil {
 		return nil, err
 	}
@@ -43,8 +54,9 @@ func (client *GithubClient) getTagAssetUrl(assetNameReg *regexp.Regexp, tag stri
 }
 
 // getLatestAssetUrl fetches github releases of the project and returns link to specified asset of latest release
-func (client *GithubClient) getLatestAssetUrl(assetNameReg *regexp.Regexp) (*string, error) {
-	release, response, err := rawClient.Repositories.GetLatestRelease(context.Background(), client.Owner, client.Repo)
+func (client *githubClient) getLatestAssetUrl(assetNameReg *regexp.Regexp) (*string, error) {
+	release, response, err := client.rawClient.Repositories.GetLatestRelease(
+		context.Background(), client.owner, client.repo)
 	if err != nil {
 		return nil, err
 	}

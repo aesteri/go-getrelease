@@ -5,10 +5,7 @@ import (
 )
 
 func main()  {
-	client := &getrelease.GithubClient{
-		Owner: "wio",
-		Repo: "wio",
-	}
+	client := getrelease.NewGithubClient(nil, "wio", "wio")
 
 	// for a directory, the content is extracted inside the folder
 	// regex can be used for names

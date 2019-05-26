@@ -5,18 +5,18 @@ type Configuration struct {
 	ProgressTracker ProgressTracker
 
 	// Archive is used for specifying achieve type while unarchiving and "false" can be used to turn unarchiving off
-	Archive     string
+	Archive string
 
 	// Checksum to verify the downloaded file
-	Checksum    string
+	Checksum string
 
 	// Filename to rename the downloaded file to
-	FileName    string
+	FileName string
 
 	// Pwd is the working directory for detection. If this isn't set, some
 	// detection may fail. Client will not default pwd to the current
 	// working directory for security reasons.
-	Pwd         string
+	Pwd string
 }
 
 type Options func(config *Configuration) error

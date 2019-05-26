@@ -5,10 +5,7 @@ import (
 )
 
 func main()  {
-	client := &getrelease.GithubClient{
-		Owner: "wio",
-		Repo: "wio",
-	}
+	client := getrelease.NewGithubClient(nil, "wio", "wio")
 
 	// wio_0.9.0_linux_64bit.tar.gz file will be downloaded inside wio folder and later renamed to wio.tar.gz
 	// The file won't be unarchieved and checksum will be verified

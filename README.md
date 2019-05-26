@@ -24,13 +24,28 @@ $ go get github.com/dhillondeep/go-getrelease
 ### Creating Client
 
 ```go
-client := &GithubClient{
-    Owner: "someOwner",
-    Repo: "someRepo",
+client := client := getrelease.NewGithubClient(nil, "someOwner", "someRepo")
+```
+
+#### Authentication
+The go-getrelease library clients does not directly handle authentication. Instead, when creating a new client, 
+pass an http.Client that can handle authentication for you. For `Github` client, this can be done as follows:
+
+```go
+import "golang.org/x/oauth2"
+
+func main() {
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: "... your access token ..."},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	client := getrelease.NewGithubClient(tc, "someOwner", "someRepo")
 }
 ```
 
-Clients contains information required to fetch information from that source.
+Note: Each client will handle authentication differently based on what can be provided.
 
 ### Downloading Latest Release Asset
 Downloading an asset from the latest release requires the name of asset and the location where the asset will be 
