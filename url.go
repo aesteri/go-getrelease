@@ -1,4 +1,4 @@
-package main
+package getrelease
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// resolveChecksum downloads checksum file and creates url query compatible with go-getter
 func resolveChecksum(urlGetter urlGetter, checksum string) (string, error) {
 	vs := strings.SplitN(checksum, ":", 2)
 	switch len(vs) {
@@ -40,6 +41,7 @@ func resolveChecksum(urlGetter urlGetter, checksum string) (string, error) {
 	}
 }
 
+// adjustUrlForGetter creates url queries compatible with go-getter
 func adjustUrlForGetter(url string, urlGetter urlGetter, option *Option) (string, error) {
 	url += "?"
 

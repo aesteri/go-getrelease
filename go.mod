@@ -1,4 +1,4 @@
-module release-downloader
+module go-getrelease
 
 go 1.12
 
