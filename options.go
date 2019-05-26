@@ -1,6 +1,6 @@
 package getrelease
 
-type Option struct {
+type Configuration struct {
 	// ProgressTracker allows to track the progress of downloads.
 	ProgressTracker ProgressTracker
 
@@ -19,12 +19,12 @@ type Option struct {
 	Pwd         string
 }
 
-type Options func(option *Option) error
+type Options func(config *Configuration) error
 
 // configure configures provided options
-func (option *Option) configure(opts ...Options) error {
+func (config *Configuration) configure(opts ...Options) error {
 	for _, opt := range opts {
-		err := opt(option)
+		err := opt(config)
 		if err != nil {
 			return err
 		}
@@ -33,33 +33,33 @@ func (option *Option) configure(opts ...Options) error {
 }
 
 // WithProgress allows for a user to track the progress of a download.
-func WithProgress(pl ProgressTracker) func(*Option) error {
-	return func(option *Option) error {
-		option.ProgressTracker = pl
+func WithProgress(pl ProgressTracker) func(*Configuration) error {
+	return func(config *Configuration) error {
+		config.ProgressTracker = pl
 		return nil
 	}
 }
 
-// WithChecksum allows for a user to provide checksum for the file
-func WithChecksum(checksum string) func(*Option) error {
-	return func(option *Option) error {
-		option.Checksum = checksum
+// WithChecksum allows for a user to provide checksum for the file.
+func WithChecksum(checksum string) func(*Configuration) error {
+	return func(config *Configuration) error {
+		config.Checksum = checksum
 		return nil
 	}
 }
 
-// WithArchive allows for a user to customize unarchiving while working with archived files
-func WithArchive(archive string) func(*Option) error {
-	return func(option *Option) error {
-		option.Archive = archive
+// WithArchive allows for a user to customize unarchiving while working with archived files.
+func WithArchive(archive string) func(*Configuration) error {
+	return func(config *Configuration) error {
+		config.Archive = archive
 		return nil
 	}
 }
 
-// WithFileName allows for a user to rename downloaded file
-func WithFileName(fileName string) func(*Option) error {
-	return func(option *Option) error {
-		option.Archive = fileName
+// WithFileName allows for a user to rename downloaded file.
+func WithFileName(fileName string) func(*Configuration) error {
+	return func(config *Configuration) error {
+		config.Archive = fileName
 		return nil
 	}
 }

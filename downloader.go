@@ -22,8 +22,8 @@ type urlGetter = func(assetNameReg *regexp.Regexp) (*string, error)
 
 // get is a generic asset fetcher and downloader
 func get(dst string, assetNameReg *regexp.Regexp, urlGetter urlGetter, opts ...Options) error {
-	option := &Option{}
-	if err := option.configure(opts...); err != nil {
+	config := &Configuration{}
+	if err := config.configure(opts...); err != nil {
 		return err
 	}
 
@@ -32,14 +32,14 @@ func get(dst string, assetNameReg *regexp.Regexp, urlGetter urlGetter, opts ...O
 		return err
 	}
 
-	url, err := adjustUrlForGetter(*retUrl, urlGetter, option)
+	url, err := adjustUrlForGetter(*retUrl, urlGetter, config)
 	if err != nil {
 		return err
 	}
 
 	if err := getter.GetAny(dst, url, func(client *getter.Client) error {
-		client.ProgressListener = option.ProgressBar
-		client.Pwd = option.Pwd
+		client.ProgressListener = config.ProgressTracker
+		client.Pwd = config.Pwd
 		return nil
 	}); err != nil {
 		return err

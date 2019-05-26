@@ -42,21 +42,21 @@ func resolveChecksum(urlGetter urlGetter, checksum string) (string, error) {
 }
 
 // adjustUrlForGetter creates url queries compatible with go-getter
-func adjustUrlForGetter(url string, urlGetter urlGetter, option *Option) (string, error) {
+func adjustUrlForGetter(url string, urlGetter urlGetter, config *Configuration) (string, error) {
 	url += "?"
 
-	if strings.TrimSpace(option.Archive) != "" {
-		url += fmt.Sprintf("%s=%s&", "archive", option.Archive)
+	if strings.TrimSpace(config.Archive) != "" {
+		url += fmt.Sprintf("%s=%s&", "archive", config.Archive)
 	}
-	if strings.TrimSpace(option.Checksum) != "" {
-		checksum, err := resolveChecksum(urlGetter, option.Checksum)
+	if strings.TrimSpace(config.Checksum) != "" {
+		checksum, err := resolveChecksum(urlGetter, config.Checksum)
 		if err != nil {
 			return "", err
 		}
 		url += fmt.Sprintf("%s=%s&", "checksum", checksum)
 	}
-	if strings.TrimSpace(option.FileName) != "" {
-		url += fmt.Sprintf("%s=%s&", "filename", option.FileName)
+	if strings.TrimSpace(config.FileName) != "" {
+		url += fmt.Sprintf("%s=%s&", "filename", config.FileName)
 	}
 
 	return strings.Trim(strings.Trim(url, "?"), "&"), nil
