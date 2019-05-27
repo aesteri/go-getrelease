@@ -1,7 +1,8 @@
 # go-getrelease
 
 go-getrelease is a library for Go (golang) for downloading release assets from source control hosting 
-sites like github, gitlab, bitbucket, etc.
+sites like github, gitlab, bitbucket, etc. This library only supports downloading files from public
+urls and hence private repositories are not yet supported.
 
 Library supports following clients:
 * [x] Github
@@ -24,7 +25,11 @@ $ go get github.com/dhillondeep/go-getrelease
 ### Creating Client
 
 ```go
-client := client := getrelease.NewGithubClient(nil, "someOwner", "someRepo")
+// Github
+client := getrelease.NewGithubClient(nil)
+
+// Gitlab
+client := getrelease.NewBasicAuthGitlabClient(nil, "https://gitlab.com", "username", "password")
 ```
 
 #### Authentication
@@ -49,7 +54,7 @@ func main() {
 ```
 
 ##### Gitlab
-Gitlab client provided three ways of authentication: `OAuth`, `Private Token` and `Basic Authorization`. You can create
+Gitlab client provides three ways of authentication: `OAuth`, `Private Token` and `Basic Authorization`. You can create
 the client accordingly using one of New functions. Examples:
 
 ```go
@@ -60,7 +65,6 @@ func main() {
 	client := getrelease.NewOAuthGitlabClient(nil, getrelease.GitlabDefaultBaseURL, token)
 }
 ```
-
 
 ### Downloading Latest Release Asset
 Downloading an asset from some release tag requires the location where the asset will be downloaded, name of asset, 

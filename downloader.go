@@ -28,7 +28,7 @@ func get(dst string, assetNameReg *regexp.Regexp, urlGetter urlGetter, opts ...O
 		return err
 	}
 
-	httpClient, retUrl, err := urlGetter(assetNameReg)
+	_, retUrl, err := urlGetter(assetNameReg)
 	if err != nil {
 		return err
 	}
@@ -39,13 +39,6 @@ func get(dst string, assetNameReg *regexp.Regexp, urlGetter urlGetter, opts ...O
 	}
 
 	if err := getter.GetAny(dst, url, func(client *getter.Client) error {
-		httpGetter := &getter.HttpGetter{
-			Netrc:  true,
-			Client: httpClient,
-		}
-		client.Getters["http"] = httpGetter
-		client.Getters["https"] = httpGetter
-
 		client.ProgressListener = config.ProgressTracker
 		client.Pwd = config.Pwd
 		return nil

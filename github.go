@@ -29,8 +29,6 @@ func (client *githubClient) getAssetUrl(release *github.RepositoryRelease,
 		return nil, nil, githubError(fmt.Errorf("invalid response status code: %s", response.Status))
 	}
 
-	fmt.Println(release.TarballURL)
-
 	for _, asset := range release.Assets {
 		if assetNameReg.Match([]byte(*asset.Name)) {
 			return client.httpClient, asset.BrowserDownloadURL, nil
