@@ -1,13 +1,12 @@
 # go-getrelease
 
 go-getrelease is a library for Go (golang) for downloading release assets from source control hosting 
-sites like github, gitlab, bitbucket, etc. This library only supports downloading files from public
+sites like github, and gitlab. This library only supports downloading files from public
 urls and hence private repositories are not yet supported.
 
 Library supports following clients:
 * [x] Github
 * [x] Gitlab
-* [ ] Bitbucket
 
 ## Installation and Usage
 
