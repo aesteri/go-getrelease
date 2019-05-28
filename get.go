@@ -9,8 +9,8 @@ import (
 
 // Client is one of github, gitlab connection that allows for fetching assets from releases
 type Client interface {
-	getLatestAssetUrl(*regexp.Regexp, string, string) (*http.Client, *string, error)
-	getTagAssetUrl(*regexp.Regexp, string, string, string) (*http.Client, *string, error)
+	getLatestAssetUrl(*regexp.Regexp, string, string) (*http.Client, *string, *string, error)
+	getTagAssetUrl(*regexp.Regexp, string, string, string) (*http.Client, *string, *string, error)
 }
 
 // ProgressTracker allows to track the progress of downloads.
@@ -19,23 +19,23 @@ type ProgressTracker interface {
 }
 
 // urlGetter is a type that returns url fetched for the asset
-type urlGetter = func(assetNameReg *regexp.Regexp) (*http.Client, *string, error)
+type urlGetter = func(assetNameReg *regexp.Regexp) (*http.Client, *string, *string, error)
 
 // get is a generic asset fetcher and downloader
-func get(dst string, assetNameReg *regexp.Regexp, urlGetter urlGetter, opts ...Options) error {
+func get(dst string, assetNameReg *regexp.Regexp, urlGetter urlGetter, opts ...Options) (string, error) {
 	config := &Configuration{}
 	if err := config.configure(opts...); err != nil {
-		return err
+		return "", err
 	}
 
-	_, retUrl, err := urlGetter(assetNameReg)
+	_, assetName, retUrl, err := urlGetter(assetNameReg)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	url, err := adjustUrlForGetter(*retUrl, urlGetter, config)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if err := getter.GetAny(dst, url, func(client *getter.Client) error {
@@ -43,26 +43,26 @@ func get(dst string, assetNameReg *regexp.Regexp, urlGetter urlGetter, opts ...O
 		client.Pwd = config.Pwd
 		return nil
 	}); err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return *assetName, nil
 }
 
 // GetTagAsset fetches provided tag release and matches the provided asset name regex with all the assets.
 // If asset is found, it is downloaded in provided dst otherwise error is thrown
-func GetTagAsset(client Client, dst, assetNameReg, owner, repo, tag string, opts ...Options) error {
+func GetTagAsset(client Client, dst, assetNameReg, owner, repo, tag string, opts ...Options) (string, error) {
 	reg, err := regexp.Compile(assetNameReg)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	urlGetter := func(assetNameReg *regexp.Regexp) (*http.Client, *string, error) {
-		client, url, err := client.getTagAssetUrl(assetNameReg, owner, repo, tag)
+	urlGetter := func(assetNameReg *regexp.Regexp) (*http.Client, *string, *string, error) {
+		client, assetName, url, err := client.getTagAssetUrl(assetNameReg, owner, repo, tag)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 
-		return client, url, nil
+		return client, assetName, url, nil
 	}
 
 	return get(dst, reg, urlGetter, opts...)
@@ -70,19 +70,19 @@ func GetTagAsset(client Client, dst, assetNameReg, owner, repo, tag string, opts
 
 // GetLatestAsset fetches latest release and matches the provided asset name regex with all the assets.
 // If asset is found, it is downloaded in provided dst otherwise error is thrown
-func GetLatestAsset(client Client, dst, assetNameReg, owner, repo string, opts ...Options) error {
+func GetLatestAsset(client Client, dst, assetNameReg, owner, repo string, opts ...Options) (string, error) {
 	reg, err := regexp.Compile(assetNameReg)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	urlGetter := func(assetNameReg *regexp.Regexp) (*http.Client, *string, error) {
-		client, url, err := client.getLatestAssetUrl(assetNameReg, owner, repo)
+	urlGetter := func(assetNameReg *regexp.Regexp) (*http.Client, *string, *string, error) {
+		client, assetName, url, err := client.getLatestAssetUrl(assetNameReg, owner, repo)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 
-		return client, url, nil
+		return client, assetName, url, nil
 	}
 
 	return get(dst, reg, urlGetter, opts...)

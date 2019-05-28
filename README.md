@@ -69,11 +69,13 @@ func main() {
 Downloading an asset from some release tag requires the location where the asset will be downloaded, name of asset, 
 owner, and repo If the asset is an archived file, it is automatically `unarchieved` but, this can be turned off by
 specifying `options`. Options are explained later on in another section. Client provided will provide information
-on where to get the release asset from.
+on where to get the release asset from. This function also returns the name of the asset.
 
 ```go
-if err := GetLatestAsset(client, "./download", "file.txt", "someOwner", "someRepo"); err != nil {
+if assetName, err := GetLatestAsset(client, "./download", "file.txt", "someOwner", "someRepo"); err != nil {
     panic(err);
+} else {
+	fmt.Println(assetName)
 }
 ```
 
@@ -81,11 +83,13 @@ if err := GetLatestAsset(client, "./download", "file.txt", "someOwner", "someRep
 Downloading an asset from some release tag requires the location where the asset will be downloaded, name of asset, 
 owner, repo, and tag name. If the asset is an archived file, it is automatically `unarchieved` but, this can be 
 turned off by specifying `options`. Options are explained later on in another section. Client provided will provide 
-information on where to get the release asset from.
+information on where to get the release asset from. This function also returns the name of asset.
 
 ```go
-if err := GetTagAsset(client, "./download", "file.txt", "someOwner", "someRepo", "v1.0.0"); err != nil {
+if assetName, err := GetTagAsset(client, "./download", "file.txt", "someOwner", "someRepo", "v1.0.0"); err != nil {
     panic(err);
+}  else {
+  	fmt.Println(assetName)
 }
 ```
 
@@ -96,7 +100,7 @@ but, you do not know the version so, you can name the asset as `asset_.*_.txt` a
 
 Example:
 ```go
-if err := getrelease.GetTagAsset(client, "./wio", "wio_.*_linux_64bit.tar.gz",
+if _, err := getrelease.GetTagAsset(client, "./wio", "wio_.*_linux_64bit.tar.gz",
     "v0.9.0", func(config *getrelease.Configuration) error {
         config.Checksum = "asset:wio_.*_checksums.txt"
         return nil
@@ -114,7 +118,7 @@ can be modified accordingly.
 Example:
 
 ```go
-if err := GetTagAsset(client, "./download", "file.txt", "v1.0.0", func(config *getrelease.Configuration) error {
+if _, err := GetTagAsset(client, "./download", "file.txt", "v1.0.0", func(config *getrelease.Configuration) error {
 	config.Checksum = "md5:46798b5cfca45c46a84b7419f8b74735"
 	return nil
 }); err != nil {
@@ -167,7 +171,7 @@ the actual checksum value of if type is "asset", "link", or "file", following ac
 If no `type` is provided, error is thrown. Examples:
 
 ```go
-if err := GetLatestAsset(client, "./download", "file.txt", func(config *getrelease.Configuration) error {
+if _, err := GetLatestAsset(client, "./download", "file.txt", func(config *getrelease.Configuration) error {
 	config.Checksum = "md5:46798b5cfca45c46a84b7419f8b74735"
 	return nil
 }); err != nil {
@@ -176,7 +180,7 @@ if err := GetLatestAsset(client, "./download", "file.txt", func(config *getrelea
 ```
 
 ```go
-if err := GetLatestAsset(client, "./download", "file.txt", func(config *getrelease.Configuration) error {
+if _, err := GetLatestAsset(client, "./download", "file.txt", func(config *getrelease.Configuration) error {
 	config.Checksum = "asset:checksum.txt"
 	return nil
 }); err != nil {
@@ -185,7 +189,7 @@ if err := GetLatestAsset(client, "./download", "file.txt", func(config *getrelea
 ```
 
 ```go
-if err := GetLatestAsset(client, "./download", "file.txt", func(config *getrelease.Configuration) error {
+if _, err := GetLatestAsset(client, "./download", "file.txt", func(config *getrelease.Configuration) error {
 	config.Checksum = "link:https://somelink/checksum.txt"
 	return nil
 }); err != nil {
@@ -204,7 +208,7 @@ When you are refering to local paths, the library needs to know the present work
 by setting `config.Pwd` option value to a path. If this is set, you can use relative paths like for example:
 
 ```go
-if err := GetLatestAsset(client, "./download", "file.txt", func(config *getrelease.Configuration) error {
+if _, err := GetLatestAsset(client, "./download", "file.txt", func(config *getrelease.Configuration) error {
 	config.Pwd = "someDir"
 	config.Checksum = "file:./checksum.txt"
 	return nil

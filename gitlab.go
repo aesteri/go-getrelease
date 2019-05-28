@@ -64,44 +64,47 @@ func (client *gitlabClient) createPid(owner, repo string) string {
 
 // getAssetUrl is a generic url getter for github release assets
 func (client *gitlabClient) getAssetUrl(release *gitlab.Release,
-	response *gitlab.Response, assetNameReg *regexp.Regexp) (*http.Client, *string, error) {
+	response *gitlab.Response, assetNameReg *regexp.Regexp) (*http.Client,
+	*string, *string, error) {
 	if response.StatusCode != 200 {
-		return nil, nil, gitlabError(fmt.Errorf("invalid response status code: %s", response.Status))
+		return nil, nil, nil, gitlabError(fmt.Errorf("invalid response status code: %s", response.Status))
 	}
 
 	for _, asset := range release.Assets.Links {
 		if assetNameReg.Match([]byte(asset.Name)) {
-			return client.httpClient, &asset.URL, nil
+			return client.httpClient, &asset.Name, &asset.URL, nil
 		}
 	}
 
-	return nil, nil, gitlabError(fmt.Errorf("%s release asset not found", assetNameReg.String()))
+	return nil, nil, nil, gitlabError(fmt.Errorf("%s release asset not found", assetNameReg.String()))
 }
 
 // getTagAssetUrl fetches gitlab releases of the project and returns link to specified asset of tag release
-func (client *gitlabClient) getTagAssetUrl(assetNameReg *regexp.Regexp, owner, repo, tag string) (*http.Client, *string, error) {
+func (client *gitlabClient) getTagAssetUrl(assetNameReg *regexp.Regexp, owner, repo,
+	tag string) (*http.Client, *string, *string, error) {
 	pid := client.createPid(owner, repo)
 	release, response, err := client.rawClient.Releases.GetRelease(pid, tag)
 	if response != nil && response.StatusCode == 403 {
-		return nil, nil, gitlabError(fmt.Errorf("no release found for tag %s in %s", tag, pid))
+		return nil, nil, nil, gitlabError(fmt.Errorf("no release found for tag %s in %s", tag, pid))
 	}
 	if err != nil {
-		return nil, nil, gitlabError(err)
+		return nil, nil, nil, gitlabError(err)
 	}
 
 	return client.getAssetUrl(release, response, assetNameReg)
 }
 
 // getLatestAssetUrl fetches gitlab releases of the project and returns link to specified asset of latest release
-func (client *gitlabClient) getLatestAssetUrl(assetNameReg *regexp.Regexp, owner, repo string) (*http.Client, *string, error) {
+func (client *gitlabClient) getLatestAssetUrl(assetNameReg *regexp.Regexp, owner,
+	repo string) (*http.Client, *string, *string, error) {
 	pid := client.createPid(owner, repo)
 	releases, response, err := client.rawClient.Releases.ListReleases(pid, nil)
 	if err != nil {
-		return nil, nil, gitlabError(err)
+		return nil, nil, nil, gitlabError(err)
 	}
 
 	if len(releases) <= 0 {
-		return nil, nil, gitlabError(fmt.Errorf("no release found for %s", pid))
+		return nil, nil, nil, gitlabError(fmt.Errorf("no release found for %s", pid))
 	}
 
 	return client.getAssetUrl(releases[0], response, assetNameReg)

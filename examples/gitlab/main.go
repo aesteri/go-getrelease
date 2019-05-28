@@ -12,7 +12,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := getrelease.GetLatestAsset(clientBasic, "./download", "assetName",
+	if _, err := getrelease.GetLatestAsset(clientBasic, "./download", "assetName",
 		"owner", "repo"); err != nil {
 		panic(err)
 	}
@@ -24,7 +24,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := getrelease.GetLatestAsset(clientOAuth, "./download", "assetName",
+	if _, err := getrelease.GetLatestAsset(clientOAuth, "./download", "assetName",
 		"owner", "repo"); err != nil {
 		panic(err)
 	}
@@ -36,7 +36,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := getrelease.GetLatestAsset(clientPrivate, "./download", "assetName",
+	if _, err := getrelease.GetLatestAsset(clientPrivate, "./download", "assetName",
 		"owner", "repo"); err != nil {
 		panic(err)
 	}

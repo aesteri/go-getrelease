@@ -26,7 +26,7 @@ func resolveChecksum(urlGetter urlGetter, checksum string) (string, error) {
 			return "", err
 		}
 
-		_, url, err := urlGetter(reg)
+		_, _, url, err := urlGetter(reg)
 		if err != nil {
 			return "", err
 		}
