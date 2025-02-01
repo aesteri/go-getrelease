@@ -1,4 +1,4 @@
-module github.com/dhillondeep/go-getrelease
+module github.com/aesteri/go-getrelease
 
 go 1.12
 
