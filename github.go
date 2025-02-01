@@ -9,21 +9,21 @@ import (
 )
 
 // GithubClient is a client for github
-type githubClient struct {
+type GithubClient struct {
 	httpClient *http.Client
 	rawClient  *github.Client
 }
 
 // NewGithubClient returns github client
-func NewGithubClient(client *http.Client) *githubClient {
-	return &githubClient{
+func NewGithubClient(client *http.Client) *GithubClient {
+	return &GithubClient{
 		httpClient: client,
 		rawClient:  github.NewClient(client),
 	}
 }
 
 // getAssetUrl is a generic url getter for github release assets
-func (client *githubClient) getAssetUrl(release *github.RepositoryRelease,
+func (client *GithubClient) getAssetUrl(release *github.RepositoryRelease,
 	response *github.Response, assetNameReg *regexp.Regexp) (*http.Client, *string, *string, error) {
 	if response.StatusCode != 200 {
 		return nil, nil, nil, githubError(fmt.Errorf("invalid response status code: %s", response.Status))
@@ -39,7 +39,7 @@ func (client *githubClient) getAssetUrl(release *github.RepositoryRelease,
 }
 
 // getTagAssetUrl fetches github releases of the project and returns link to specified asset of tag release
-func (client *githubClient) getTagAssetUrl(assetNameReg *regexp.Regexp,
+func (client *GithubClient) getTagAssetUrl(assetNameReg *regexp.Regexp,
 	owner, repo, tag string) (*http.Client, *string, *string, error) {
 	release, response, err := client.rawClient.Repositories.GetReleaseByTag(context.Background(), owner, repo, tag)
 	if err != nil {
@@ -50,7 +50,7 @@ func (client *githubClient) getTagAssetUrl(assetNameReg *regexp.Regexp,
 }
 
 // getLatestAssetUrl fetches github releases of the project and returns link to specified asset of latest release
-func (client *githubClient) getLatestAssetUrl(assetNameReg *regexp.Regexp,
+func (client *GithubClient) getLatestAssetUrl(assetNameReg *regexp.Regexp,
 	owner, repo string) (*http.Client, *string, *string, error) {
 	release, response, err := client.rawClient.Repositories.GetLatestRelease(
 		context.Background(), owner, repo)
